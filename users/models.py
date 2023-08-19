@@ -22,6 +22,8 @@ class User(AbstractUser):
 
     profile_picture = models.ImageField(upload_to="profile_pictures", null=True, blank=True)
     birth_date = models.DateField(null=True, blank=True)
+    invite_code = models.CharField(max_length=6, blank=True, null=True)
+    invite_code_activated = models.BooleanField(default=False)
 
     USERNAME_FIELD = "phone_number"
 
@@ -59,7 +61,3 @@ class VerificationCode(models.Model):
 
     class Meta:
         unique_together = ["phone", "verification_type"]
-
-    @property
-    def is_expire(self):
-        return self.expired_at < self.last_sent_time + timedelta(seconds=30)

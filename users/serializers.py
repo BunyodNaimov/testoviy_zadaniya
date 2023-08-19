@@ -4,20 +4,25 @@ from users.models import User
 from users.utils import phone_regex
 
 
-class UserRegisterSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'phone_number')
-        read_only_field = ('id',)
-
-
-class UserLoginSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(max_length=100)
-    password = serializers.CharField(max_length=100)
+class UserSerializer(serializers.ModelSerializer):
+    invite_code_activated = serializers.BooleanField(read_only=True)
+    invite_code = serializers.CharField(read_only=True)
 
     class Meta:
         model = User
-        fields = ('username', 'password')
+        fields = (
+            "id", "username", "invite_code", 'invite_code_activated', "email", "first_name", "last_name", "phone_number"
+        )
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    invite_code = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = (
+            "id", "invite_code",
+        )
 
 
 class SendPhoneVerificationCodeSerializer(serializers.Serializer):
