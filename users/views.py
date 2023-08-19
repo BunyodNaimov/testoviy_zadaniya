@@ -1,17 +1,20 @@
 from django.contrib.auth import authenticate
-from django.shortcuts import render
+from django.utils.crypto import get_random_string
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status, permissions
 from rest_framework.generics import CreateAPIView, GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken, Token
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from users.models import CustomUser
-from users.serializers import UserRegisterSerializer, UserLoginSerializer
+from users.models import User
+from users.serializers import UserRegisterSerializer, UserLoginSerializer, SendPhoneVerificationCodeSerializer
+from users.models import VerificationCode
+from users.tasks import send_verification_code
 
 
 class UserRegisterAPIView(CreateAPIView):
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
 
     def create(self, request, *args, **kwargs):
@@ -19,7 +22,7 @@ class UserRegisterAPIView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
 
-        # parolni shifrlash
+        # шифрование пароля
         user.set_password(request.data.get('password'))
         user.save()
 
@@ -41,3 +44,20 @@ class UserLoginAPIView(GenericAPIView):
         data = serializer.data
         data['tokens'] = {'refresh': str(token), 'access': str(token.access_token)}
         return Response(data=data, status=status.HTTP_200_OK)
+
+
+class SendPhoneVerificationCodeView(APIView):
+
+    @swagger_auto_schema(request_body=SendPhoneVerificationCodeSerializer)
+    def post(self, request, *args, **kwargs):
+        serializer = SendPhoneVerificationCodeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        phone = serializer.validated_data.get("phone")
+        code = get_random_string(allowed_chars="0123456789", length=4)
+        verification_code, _ = (
+            VerificationCode.objects.update_or_create(
+                phone=phone, defaults={"code": code, "is_verified": False}
+            )
+        )
+        send_verification_code.delay(phone, code)
+        return Response({"detail": "Verification code sent."})

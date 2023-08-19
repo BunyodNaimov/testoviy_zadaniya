@@ -11,20 +11,26 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+import environ
+
+env = environ.Env(DEBUG=(bool, False))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-a2=+!zh22r3t^!j3y^kq^$i%so6-8mj09wu910$07o!a%#a&0y'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -36,12 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # My package
-    'rest_framework',
-    'django_filters',
-    'rest_framework_simplejwt',
     'drf_yasg',
+    'rest_framework',
+    'rest_framework_simplejwt',
     # My apps
-    'employee',
     'users',
 ]
 
@@ -134,7 +138,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = 'users.User'
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
@@ -148,3 +152,9 @@ SWAGGER_SETTINGS = {
     'LOGOUT_URL': 'rest_framework:logout'
 
 }
+
+SMS_EMAIL = env("SMS_EMAIL")
+SMS_KEY = env("SMS_KEY")
+
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_BROKER_URL = "redis://localhost:6380/0"
