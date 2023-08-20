@@ -2,16 +2,13 @@ import random
 import string
 from django.utils.crypto import get_random_string
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from users.models import User
-from users.send_code import send_code_to_phone
 from users.serializers import (
     SendPhoneVerificationCodeSerializer,
     CheckPhoneVerificationCodeSerializer,
@@ -70,60 +67,37 @@ class CheckPhoneVerificationCodeView(CreateAPIView):
         # Проверка, если пользователь ранее не авторизовывался
         user = User.objects.filter(phone_number=phone).first()
         if not user:
-            invite_code = ''
+            invite_code_own = ''
             # Генерация случайного инвайт-кода
             while True:
-                invite_code = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
-                if invite_code.isalnum():
+                invite_code_own = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
+                if invite_code_own.isalnum():
                     break
             # Создание нового пользователя с инвайт-кодом
-            user = User.objects.create_user(phone_number=phone, invite_code=invite_code.upper())
+            user = User.objects.create_user(phone_number=phone, invite_code_own=invite_code_own.upper())
         return Response({"tokens": user.tokens(), "detail": "Verification code is verified."})
 
 
 class ProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    # def get(self, request, *args, **kwargs):
-    #     serializer = UserSerializer(request.user)
-    #     return Response(serializer.data)
-
-    # @swagger_auto_schema(request_body=UserSerializer)
-    # def put(self, request, *args, **kwargs):
-    #     serializer = UserSerializer(instance=request.user, data=request.data, partial=True)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     def get(self, request, *args, **kwargs):
         user = request.user
-        serializer = UserSerializer(user)
+        serializer = UserProfileSerializer(user)
         return Response(serializer.data)
 
-    @swagger_auto_schema(request_body=UserProfileSerializer)
+    @swagger_auto_schema(request_body=UserSerializer)
     def post(self, request, *args, **kwargs):
         user = request.user
         invite_code = request.data.get("invite_code")
-        print(user.invite_code)
-
-        if user.invite_code_activated:
-            return Response({"invite_code": user.invite_code}, status=200)
-
-        # Проверка введенного инвайт-кода
-        if  invite_code != user.invite_code and user.invite_code is not None:
+        if invite_code == user.invite_code_own:
             return Response({"detail": "Invalid invite code."}, status=400)
 
-        # Проверка, что инвайт-код еще не был активирован
-        if user.invite_code_activated:
+        if user.invite_code_used_activated:
             return Response({"detail": "Invite code has already been activated."}, status=400)
 
-        # Присвоение статуса активации инвайт-кода пользователю
-        user.invite_code_activated = True
-        user.invite_code = invite_code
+        user.invite_code_used_activated = True
+        user.invite_code_used = invite_code
         user.save()
-        # Дополнительная логика для активации инвайт-кода
-        user.profile.is_completed = True
-        user.profile.save()
         serializer = UserProfileSerializer(user)
         return Response(serializer.data)

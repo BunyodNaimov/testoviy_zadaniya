@@ -22,8 +22,9 @@ class User(AbstractUser):
 
     profile_picture = models.ImageField(upload_to="profile_pictures", null=True, blank=True)
     birth_date = models.DateField(null=True, blank=True)
-    invite_code = models.CharField(max_length=6, blank=True, null=True)
-    invite_code_activated = models.BooleanField(default=False)
+    invite_code_own = models.CharField(unique=True, max_length=6, blank=True, null=True)
+    invite_code_used = models.CharField(unique=True, max_length=6, blank=True, null=True)
+    invite_code_used_activated = models.BooleanField(default=False)
 
     USERNAME_FIELD = "phone_number"
 
