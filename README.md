@@ -1,7 +1,7 @@
 ## Добро пожаловать в проект [Тестовое задание для Python разработчика](https://testoviyzadaniya.pythonanywhere.com/swagger/)!
 # Обзор проекта
 
-простую реферальную систему с использованием Python, Django, Django REST Framework (DRF) и PostgreSQL.
+Этот проект представляет простую реферальную систему с использованием Python, Django, Django REST Framework (DRF) и PostgreSQL.
 
 # Установка
 
