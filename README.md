@@ -199,3 +199,56 @@ class ProfileAPIView(APIView):
 
 
 ProfileAPIView - представление для работы с профилем пользователя. Оно наследуется от APIView и требует аутентификации (IsAuthenticated) для доступа. Представление содержит методы get и post. Метод get возвращает данные профиля аутентифицированного пользователя в формате JSON. Метод post обрабатывает POST-запросы для активации кода приглашения. Если код приглашения верен и еще не был активирован, то устанавливается флаг активации и возвращаются данные профиля.
+
+# Сериализаторы (Serializers)
+## UserProfileSerializer(ModelSerializer)
+```style
+class UserProfileSerializer(serializers.ModelSerializer):
+    invite_code_used_activated = serializers.BooleanField(read_only=True)
+    invite_code_own = serializers.CharField(read_only=True)
+    invite_code_used = serializers.CharField(read_only=True)
+    invited_users = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            "id", "username", "invited_users", "invite_code_own", "invite_code_used", 'invite_code_used_activated',
+            "email", "first_name", "last_name", "phone_number"
+        )
+
+    def get_invited_users(self, obj):
+        if obj.invite_code_used_activated:
+            invited_users = User.objects.filter(invite_code_used=obj.invite_code_own)
+            return invited_users.values_list('phone_number', flat=True)
+        return []
+```
+UserProfileSerializer - сериализатор для модели User, который определяет, как поля модели должны быть сериализованы и десериализованы. Внутри класса UserProfileSerializer определены различные поля сериализатора, такие как invite_code_used_activated, invite_code_own, invite_code_used и invited_users. Некоторые из этих полей являются только для чтения (read_only=True), что означает, что они не будут приниматься при десериализации. invited_users определен как SerializerMethodField, который позволяет определить собственный метод get_invited_users, который будет использоваться для получения данных поля. Класс Meta определяет модель, с которой ассоциирован сериализатор, а также список полей, которые должны быть сериализованы.
+
+## UserSerializer(ModelSerializer)
+```style
+class UserSerializer(serializers.ModelSerializer):
+    invite_code = serializers.CharField()
+
+    class Meta:
+        model = User
+        fields = (
+            "id", "invite_code",
+        )
+```
+
+UserSerializer - сериализатор для модели User, который определяет только одно поле invite_code. Это поле предназначено для активации кода приглашения. Класс Meta определяет модель и список полей, которые должны быть сериализованы.
+
+##  SendPhoneVerificationCodeSerializer(Serializer)
+```style
+class SendPhoneVerificationCodeSerializer(serializers.Serializer):
+    phone = serializers.CharField(max_length=15, validators=[phone_regex])
+```
+SendPhoneVerificationCodeSerializer - сериализатор, используемый в представлении SendPhoneVerificationCodeView. Он определяет одно поле phone, которое должно содержать номер телефона. Он также применяет валидатор phone_regex, чтобы убедиться, что номер телефона соответствует заданному шаблону.
+
+##  CheckPhoneVerificationCodeSerializer(Serializer)
+```style
+class CheckPhoneVerificationCodeSerializer(serializers.Serializer):
+    phone = serializers.CharField(max_length=15, validators=[phone_regex])
+    code = serializers.CharField(min_length=4, max_length=4)
+```
+CheckPhoneVerificationCodeSerializer - сериализатор, используемый в представлении CheckPhoneVerificationCodeView. Он определяет два поля: phone (номер телефона) и code (верификационный код). Он также применяет валидаторы для проверки допустимой длины номера телефона и верификационного кода.
