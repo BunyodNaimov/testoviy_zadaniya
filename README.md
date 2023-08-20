@@ -123,6 +123,13 @@ class SendPhoneVerificationCodeView(APIView):
 ```
 SendPhoneVerificationCodeView - представление для отправки кода верификации на указанный телефон. Оно наследуется от APIView и содержит метод post, который обрабатывает POST-запросы. В методе post используется SendPhoneVerificationCodeSerializer для валидации данных, после чего генерируется случайный код и отправляется на указанный телефон. Ответ возвращается в формате JSON с деталями результата отправки кода.
 
+## primer 
+![image](https://github.com/BunyodNaimov/testoviy_zadaniya/assets/122611882/c9f884ea-95d0-4532-8d87-c86d83513ae7)
+
+![image](https://github.com/BunyodNaimov/testoviy_zadaniya/assets/122611882/da67d1be-ab43-4aae-aa32-a9625997744b)
+
+
+
 ## CheckPhoneVerificationCodeView (CreateAPIView)
 ```stylus
 class CheckPhoneVerificationCodeView(CreateAPIView):
@@ -168,6 +175,10 @@ class CheckPhoneVerificationCodeView(CreateAPIView):
 ```
 
 CheckPhoneVerificationCodeView - представление для проверки верификационного кода, введенного пользователем. Оно наследуется от CreateAPIView и определяет метод create, который обрабатывает POST-запросы. В методе create используется CheckPhoneVerificationCodeSerializer для валидации данных, после чего происходит проверка верификационного кода. Если код верен, то устанавливается флаг верификации для соответствующего объекта VerificationCode, создается новый пользователь, если его нет в базе данных, и возвращается ответ с токенами доступа и деталями верификации.
+
+## primer
+
+![image](https://github.com/BunyodNaimov/testoviy_zadaniya/assets/122611882/92db9ca5-85f9-4e1a-accb-0b7e344b6def)
 
 
 ## ProfileAPIView(APIView)
