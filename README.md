@@ -14,7 +14,7 @@ pip install django
 
 Клонируйте репозиторий проекта:
 ```stylus
-git clone https://github.com/BunyodNaimov/minbar-uz-clone.git
+https://github.com/BunyodNaimov/testoviy_zadaniya.git
 ```
 
 Перейдите в директорию проекта:
