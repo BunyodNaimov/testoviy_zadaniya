@@ -65,16 +65,13 @@ class CheckPhoneVerificationCodeView(CreateAPIView):
         verification_code.is_verified = True
         verification_code.save(update_fields=["is_verified"])
 
-        # Проверка, если пользователь ранее не авторизовывался
         user = User.objects.filter(phone_number=phone).first()
         if not user:
             invite_code_own = ''
-            # Генерация случайного инвайт-кода
             while True:
                 invite_code_own = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
                 if invite_code_own.isalnum():
                     break
-            # Создание нового пользователя с инвайт-кодом
             user = User.objects.create_user(phone_number=phone, invite_code_own=invite_code_own.upper())
         return Response({"tokens": user.tokens(), "detail": "Verification code is verified."})
 

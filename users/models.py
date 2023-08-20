@@ -43,16 +43,11 @@ class User(AbstractUser):
 
 
 class VerificationCode(models.Model):
-    class VerificationTypes(models.TextChoices):
-        REGISTER = "register"
-        LOGIN = "login"
-
     code = models.CharField(max_length=6)
     user = models.ForeignKey(
         "users.User", on_delete=models.CASCADE, related_name="verification_codes", null=True, blank=True
     )
     phone = models.CharField(max_length=15, unique=True, null=True, validators=[phone_regex])
-    verification_type = models.CharField(max_length=50, choices=VerificationTypes.choices)
     last_sent_time = models.DateTimeField(auto_now=True)
     is_verified = models.BooleanField(default=False)
     expired_at = models.DateTimeField(null=True)
@@ -60,5 +55,3 @@ class VerificationCode(models.Model):
     def __str__(self):
         return self.phone
 
-    class Meta:
-        unique_together = ["phone", "verification_type"]

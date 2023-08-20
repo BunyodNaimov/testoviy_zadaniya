@@ -18,9 +18,6 @@ def get_token():
 
 
 def send_code_to_phone(phone: str, code):
-    # Задержка на 2 секунды
-    time.sleep(2)
-
     url = "https://notify.eskiz.uz/api/message/sms/send"
 
     payload = {
