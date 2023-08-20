@@ -211,6 +211,10 @@ class ProfileAPIView(APIView):
 
 ProfileAPIView - представление для работы с профилем пользователя. Оно наследуется от APIView и требует аутентификации (IsAuthenticated) для доступа. Представление содержит методы get и post. Метод get возвращает данные профиля аутентифицированного пользователя в формате JSON. Метод post обрабатывает POST-запросы для активации кода приглашения. Если код приглашения верен и еще не был активирован, то устанавливается флаг активации и возвращаются данные профиля.
 
+# primer
+![image](https://github.com/BunyodNaimov/testoviy_zadaniya/assets/122611882/1537a38e-90d6-4e9d-90a8-1477a156aaf3)
+
+
 # Сериализаторы (Serializers)
 ## UserProfileSerializer(ModelSerializer)
 ```stylus
