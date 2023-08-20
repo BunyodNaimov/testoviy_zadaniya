@@ -8,16 +8,3 @@ phone_regex = RegexValidator(
 
 DEFAULT_DIAL_CODE = "+998"
 
-
-# def check_verification_code(phone_number, verification_type, code):
-#     verification_code = VerificationCode.objects.filter(phone=phone_number, verification_type=verification_type,
-#                                                         is_verified=False).last()
-#
-#     if verification_code:
-#         if not verification_code.expired and verification_code.code == code:
-#             verification_code.is_verified = True
-#             verification_code.save(update_fields=['is_verified'])
-#             return True
-#         return False
-
-

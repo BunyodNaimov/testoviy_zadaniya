@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from users.models import User
+from users.send_code import send_code_to_phone
 from users.serializers import (
     SendPhoneVerificationCodeSerializer,
     CheckPhoneVerificationCodeSerializer,
@@ -29,8 +30,8 @@ class SendPhoneVerificationCodeView(APIView):
                 phone=phone, defaults={"code": code, "is_verified": False}
             )
         )
-        # response_from_service = send_code_to_phone(phone, code)
-        return Response({"detail": "response_from_service"})
+        response_from_service = send_code_to_phone(phone, code)
+        return Response({"detail": response_from_service})
 
 
 class CheckPhoneVerificationCodeView(CreateAPIView):
